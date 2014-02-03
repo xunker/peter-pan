@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require 'yaml'
 
 class PeterPan
   def initialize(opts={})
@@ -41,6 +42,79 @@ class PeterPan
     str << "+#{'-' * (x2)}+\n"
     str
   end
+
+  def plot_sprite(sprite, x, y)
+    sprite.each_with_index do |line, line_y|
+      line.split('').each_with_index do |c, char_x|
+        plot(char_x + x, line_y + y, c)
+      end
+    end
+  end
+
+  def write(font, x, y, message)
+    letter_x = x
+    message.split('').each do |c|
+      char = font['characters'][c].map{|l|l.gsub('.', ' ')}
+      plot_sprite(char, letter_x, y)
+      letter_x = letter_x + font['width'] + 1
+    end
+  end
+
+  def buffer_width
+    @buffer.first.size+1
+  end
+
+  def buffer_height
+    @buffer.size+1
+  end
+
+  def calculate_integral_points(x1, y1, x2, y2)
+    # pt1 = [x1, y1]
+    # pt2 = [x2, y2]
+    # m = (pt1[1] - pt2[1]) / (pt1[0] - pt2[0])
+    # b = pt1[1] - m * pt1[0]
+
+    # i = pt1[0]
+    # points = []
+    # while i <= pt2[0] do
+    #   points << [i, m * i + b]
+    #   i += 1
+    # end
+    # points
+
+    x_integrals = []
+    if x1 < x2
+      x1.upto(x2) do |i|
+        x_integrals << i
+      end
+    else
+      x1.downto(x2) do |i|
+        x_integrals << i
+      end
+    end
+
+    y_integrals = []
+    if y1 < y2
+      y1.upto(y2) do |i|
+        y_integrals << i
+      end
+    else
+      y1.downto(y2) do |i|
+        y_integrals << i
+      end
+    end
+
+    while x_integrals.length < y_integrals.length
+      x_integrals << x_integrals.last
+    end
+
+    while y_integrals.length < x_integrals.length
+      y_integrals << y_integrals.last
+    end
+
+    x_integrals.zip(y_integrals)
+    # [ x_integrals, y_integrals ]
+  end
 end
 
 p = PeterPan.new
@@ -50,40 +124,86 @@ p = PeterPan.new
 #     p.plot(i+ii,ii, i)
 #   end
 # end
-p.plot(0,6, 'A')
-p.plot(2,6, 'B')
-p.plot(4,6, 'C')
-p.plot(35,6, 'D')
-p.plot(5,6, 'F')
-p.plot(7,6, 'G')
-p.plot(9,6, 'H')
-p.plot(30,4, 'I')
+# p.plot(0,6, 'A')
+# p.plot(2,6, 'B')
+# p.plot(4,6, 'C')
+# p.plot(35,6, 'D')
+# p.plot(5,6, 'F')
+# p.plot(7,6, 'G')
+# p.plot(9,6, 'H')
+# p.plot(30,4, 'I')
 
+# puts p.show_buffer
+
+# # 42.times do |i|
+# #   puts p.show_viewport(i,0)
+# #   sleep(0.1)
+# # end
+# # 15.times do |i|
+# #   puts p.show_viewport(0,i)
+# #   sleep(0.1)
+# # end
+
+# pt1 = [0, 0]
+# pt2 = [10, 10]
+# m = (pt1[1] - pt2[1]) / (pt1[0] - pt2[0])
+# b = pt1[1] - m * pt1[0]
+
+# i = pt1[0]
+# points = []
+# while i <= pt2[0] do
+#   points << [i, m * i + b]
+#   i += 1
+# end
+
+# # puts points.inspect
+# points.each do |px, py|
+#   puts p.show_viewport(px, py)
+#   sleep(0.1)
+# end
+
+###
+
+# font = YAML.load(File.new('./fonts/transpo.yml').read)
+# p.write(font, 0, 0, 'Hello, world!')
+# puts p.show_buffer
+
+# pt1 = [0, 0]
+# pt2 = [p.buffer_width-1, 0]
+# m = (pt1[1] - pt2[1]) / (pt1[0] - pt2[0])
+# b = pt1[1] - m * pt1[0]
+
+# i = pt1[0]
+# points = []
+# while i <= pt2[0] do
+#   points << [i, m * i + b]
+#   i += 1
+# end
+
+# # puts points.inspect
+# points.each do |px, py|
+#   puts p.show_viewport(px, py)
+#   sleep(0.05)
+# end
+
+###
+
+font = YAML.load(File.new('./fonts/transpo.yml').read)
+p.write(font, 0, 0, 'Hello,')
+p.write(font, 0, font["height"]+1, 'world!')
 puts p.show_buffer
 
-# 42.times do |i|
-#   puts p.show_viewport(i,0)
-#   sleep(0.1)
-# end
-# 15.times do |i|
-#   puts p.show_viewport(0,i)
-#   sleep(0.1)
-# end
-
-pt1 = [0, 0]
-pt2 = [10, 10]
-m = (pt1[1] - pt2[1]) / (pt1[0] - pt2[0])
-b = pt1[1] - m * pt1[0]
-
-i = pt1[0]
-points = []
-while i <= pt2[0] do
-  points << [i, m * i + b]
-  i += 1
+p.calculate_integral_points(0,0,p.buffer_width-1,0).each do |px, py|
+  puts p.show_viewport(px, py)
+  sleep(0.05)
 end
 
-# puts points.inspect
-points.each do |px, py|
+p.calculate_integral_points(p.buffer_width-1,0,0,font["height"]+1).each do |px, py|
   puts p.show_viewport(px, py)
-  sleep(0.1)
+  sleep(0.05)
+end
+
+p.calculate_integral_points(0, font["height"]+1,p.buffer_width-1, font["height"]+1).each do |px, py|
+  puts p.show_viewport(px, py)
+  sleep(0.05)
 end
