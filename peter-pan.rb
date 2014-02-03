@@ -2,6 +2,8 @@
 require 'yaml'
 
 class PeterPan
+  attr_reader :viewport_width, :viewport_height
+
   def initialize(opts={})
     @viewport_width = (opts[:viewport_width] || 21).to_i # x
     @viewport_height = (opts[:viewport_height] || 7).to_i # y
@@ -105,11 +107,11 @@ class PeterPan
     end
 
     while x_integrals.length < y_integrals.length
-      x_integrals.unshift(x_integrals.last)
+      x_integrals.unshift(x_integrals.first)
     end
 
     while y_integrals.length < x_integrals.length
-      y_integrals.unshift(y_integrals.last)
+      y_integrals.unshift(y_integrals.first)
     end
 
     x_integrals.zip(y_integrals)
@@ -193,17 +195,24 @@ p.write(font, 0, 0, 'Hello,')
 p.write(font, 0, font["height"]+1, 'world!')
 puts p.show_buffer
 
-p.calculate_integral_points(0,0,p.buffer_width-1,0).each do |px, py|
-  puts p.show_viewport(px, py)
-  sleep(0.05)
-end
+loop do
+  p.calculate_integral_points(0,0,p.buffer_width-p.viewport_width,0).each do |px, py|
+    puts p.show_viewport(px, py)
+    sleep(0.05)
+  end
 
-p.calculate_integral_points(p.buffer_width-1,0,0,font["height"]+1).each do |px, py|
-  puts p.show_viewport(px, py)
-  sleep(0.05)
-end
+  p.calculate_integral_points(p.buffer_width-p.viewport_width,0,0,font["height"]+1).each do |px, py|
+    puts p.show_viewport(px, py)
+    sleep(0.05)
+  end
 
-p.calculate_integral_points(0, font["height"]+1,p.buffer_width-1, font["height"]+1).each do |px, py|
-  puts p.show_viewport(px, py)
-  sleep(0.05)
+  p.calculate_integral_points(0, font["height"]+1,p.buffer_width-p.viewport_width, font["height"]+1).each do |px, py|
+    puts p.show_viewport(px, py)
+    sleep(0.05)
+  end
+
+  p.calculate_integral_points(p.buffer_width-p.viewport_width, font["height"]+1, 0, 0).each do |px, py|
+    puts p.show_viewport(px, py)
+    sleep(0.05)
+  end
 end
