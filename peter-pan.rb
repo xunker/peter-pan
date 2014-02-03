@@ -34,13 +34,22 @@ class PeterPan
   end
 
   def show_viewport(x,y,x2=@viewport_width,y2=@viewport_height)
-    str = "+#{'-' * (x2)}+\n"
+    str = ""
     y.upto((y2-1)+y) do |i|
       buffer_row = @buffer[i] || @viewport_width.times.map{' '}
-      str << '|'
+      # str << '|'
       str << sprintf("%-#{x2}s", buffer_row[x..((x2-1)+x)].join)
-      str << "|\n"
+      # str << "|\n"
+      str << "\n"
     end
+    
+    str
+  end
+
+  def pretty_print_viewport(x,y,x2=@viewport_width,y2=@viewport_height)
+    str = "+#{'-' * (x2)}+\n"
+    vp = show_viewport(x,y,x2,y2)
+    str << vp.gsub(/^/, '|').gsub(/$/, '|').gsub(/^\|$/, '')
     str << "+#{'-' * (x2)}+\n"
     str
   end
@@ -109,24 +118,68 @@ end
 p = PeterPan.new
 
 font = YAML.load(File.new('./fonts/transpo.yml').read)
-p.write(font, 0, 0, 'Hello,')
-p.write(font, 0, font["height"]+1, 'world!')
+# p.write(font, 0, 0, 'Hello,')
+# p.write(font, 0, font["height"]+1, 'world!')
+lines = [
+  "Hello,", "world!"
+]
+
+lines.each_with_index do |line, i|
+  puts line
+  puts i
+  p.write(font, 0, (i*font["height"]), line)
+end
+
 puts p.show_buffer
+
+require 'dream-cheeky/led'
+message_board = DreamCheeky::LEDMessageBoard.first
+
+#test if sign connected
+begin
+  message_board.draw('x')
+rescue NoMethodError
+  puts "Sign not connected"
+  message_board = nil
+end
 
 start_x=0
 start_y=0
+
 loop do
-  [
-    [p.buffer_width-p.viewport_width,0],
-    [0,font["height"]+1],
-    [p.buffer_width-p.viewport_width, font["height"]+1],
-    [0, 0]
-  ].each do |x,y|
-    p.calculate_integral_points(start_x, start_y, x, y).each do |px, py|
-      puts p.show_viewport(px, py)
-      sleep(0.1)
+  lines.each_with_index do |line, i|
+    [
+      [p.buffer_width-p.viewport_width,0],
+      [0,font["height"]+1],
+      [p.buffer_width-p.viewport_width, font["height"]+1],
+      [0, 0]
+    ].each do |x,y|
+      p.calculate_integral_points(start_x, start_y, x, y).each do |px, py|
+        puts p.pretty_print_viewport(px, py)
+        message_board.draw(p.show_viewport(px, py)) if message_board
+        sleep(0.1)
+      end
+      start_x = x
+      start_y = y
     end
-    start_x = x
-    start_y = y
   end
 end
+
+# start_x=0
+# start_y=0
+# loop do
+#   [
+#     [p.buffer_width-p.viewport_width,0],
+#     [0,font["height"]+1],
+#     [p.buffer_width-p.viewport_width, font["height"]+1],
+#     [0, 0]
+#   ].each do |x,y|
+#     p.calculate_integral_points(start_x, start_y, x, y).each do |px, py|
+#       puts p.show_viewport(px, py)
+#       message_board.draw(p.show_viewport(px, py))
+#       sleep(0.1)
+#     end
+#     start_x = x
+#     start_y = y
+#   end
+# end
