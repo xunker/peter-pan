@@ -105,11 +105,11 @@ class PeterPan
     end
 
     while x_integrals.length < y_integrals.length
-      x_integrals << x_integrals.last
+      x_integrals.unshift(x_integrals.last)
     end
 
     while y_integrals.length < x_integrals.length
-      y_integrals << y_integrals.last
+      y_integrals.unshift(y_integrals.last)
     end
 
     x_integrals.zip(y_integrals)
