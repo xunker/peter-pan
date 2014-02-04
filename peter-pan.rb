@@ -7,7 +7,7 @@ class PeterPan
   def initialize(opts={})
     @viewport_width = (opts[:viewport_width] || 21).to_i # x
     @viewport_height = (opts[:viewport_height] || 7).to_i # y
-
+    @buffer_changed = false
     @buffer = []
   end
 
@@ -20,9 +20,13 @@ class PeterPan
     end
 
     @buffer[y][x] = value.to_s.slice(0,1)
+
+    @buffer_changed = true
   end
 
   def show_buffer
+    normalize_buffer_size
+    
     str = "+#{'-' * @buffer.first.size}+\n"
     @buffer.each do |bx|
       str << '|'
@@ -33,13 +37,30 @@ class PeterPan
     str
   end
 
+  def normalize_buffer_size
+    return unless @buffer_changed
+    longest_x = 0
+    @buffer.each do |by|
+      longest_x = by.size if by.size > longest_x
+    end
+    puts "longest_x: #{longest_x}"
+
+    @buffer.each do |by|
+      if by.size < longest_x
+        (by.size-1).upto(longest_x-1) do |i|
+          by[i] = ' '
+        end
+      end 
+    end
+  end
+
   def show_viewport(x,y,x2=@viewport_width,y2=@viewport_height)
+    normalize_buffer_size
+
     str = ""
     y.upto((y2-1)+y) do |i|
       buffer_row = @buffer[i] || @viewport_width.times.map{' '}
-      # str << '|'
       str << sprintf("%-#{x2}s", buffer_row[x..((x2-1)+x)].join)
-      # str << "|\n"
       str << "\n"
     end
     
@@ -120,12 +141,20 @@ p = PeterPan.new
 font = YAML.load(File.new('./fonts/transpo.yml').read)
 # p.write(font, 0, 0, 'Hello,')
 # p.write(font, 0, font["height"]+1, 'world!')
+# lines = [
+#   "Hello,", "world!"
+# ]
+
 lines = [
-  "Hello,", "world!"
+  "One",
+  "Two",
+  "Three",
+  "Four",
+  "Five"
 ]
 
 lines.each_with_index do |line, i|
-  puts line
+  puts "#{(i*font["height"])} #{line}"
   puts i
   p.write(font, 0, (i*font["height"]), line)
 end
@@ -143,43 +172,29 @@ rescue NoMethodError
   message_board = nil
 end
 
-start_x=0
-start_y=0
+def pan_to(p, message_board, x1, y1, x2, y2)
+  p.calculate_integral_points(x1, y1, x2, y2).each do |px, py|
+    puts "x1: #{x1} y1: #{y1}, x2: #{x2} y2:#{y2}"
+    puts p.pretty_print_viewport(px, py)
+    message_board.draw(p.show_viewport(px, py)) if message_board
+    sleep(0.1)
+  end
+end
 
 loop do
+  start_x=0
+  start_y=0
+
   lines.each_with_index do |line, i|
     [
-      [p.buffer_width-p.viewport_width,0],
-      [0,font["height"]+1],
-      [p.buffer_width-p.viewport_width, font["height"]+1],
-      [0, 0]
+      [(line.size*font["width"])-p.viewport_width,(i*(font["height"]))],
+      [0,(i+1*(font["height"]))+(i==lines.size-1 ? 0:1)]
     ].each do |x,y|
-      p.calculate_integral_points(start_x, start_y, x, y).each do |px, py|
-        puts p.pretty_print_viewport(px, py)
-        message_board.draw(p.show_viewport(px, py)) if message_board
-        sleep(0.1)
-      end
+      pan_to(p, message_board, start_x, start_y, x, y)
       start_x = x
       start_y = y
     end
   end
+  pan_to(p, message_board, start_x, start_y, 0, 0)
 end
 
-# start_x=0
-# start_y=0
-# loop do
-#   [
-#     [p.buffer_width-p.viewport_width,0],
-#     [0,font["height"]+1],
-#     [p.buffer_width-p.viewport_width, font["height"]+1],
-#     [0, 0]
-#   ].each do |x,y|
-#     p.calculate_integral_points(start_x, start_y, x, y).each do |px, py|
-#       puts p.show_viewport(px, py)
-#       message_board.draw(p.show_viewport(px, py))
-#       sleep(0.1)
-#     end
-#     start_x = x
-#     start_y = y
-#   end
-# end
