@@ -129,6 +129,22 @@ class PeterPan
     end
   end
 
+  # clears everything out of the buffer.
+  # By default, sets the buffer dimensions to 0x0. Optionally, you can pass
+  # :width and :height args and the buffer dimentions will be set accordingly.
+  # By default the buffer will be filled with space character, but you can 
+  # set the char to be used by passing :clear_with
+  def clear_buffer!(opts={})
+    opts = { :width => 0, :height => 0, :clear_with => ' ' }.merge(opts)
+    @buffer = [[]]
+    opts[:height].times do |y|
+      @buffer[y] = []
+      opts[:width].times do |x|
+        @buffer[y][x] = opts[:clear_with].to_s.slice(0,1)
+      end
+    end
+  end
+
   # returns a data structure representing the current font used by #write.
   def font
     @font ||= YAML.load(File.new("./fonts/#{@font_name}.yml").read)
@@ -213,35 +229,39 @@ end
 
 puts p.pretty_print_buffer
 
-require 'dream-cheeky/led'
-message_board = DreamCheeky::LEDMessageBoard.first
+p.clear_buffer!(width: 10, height: 3, clear_with: 'x')
 
-#test if sign connected
-begin
-  message_board.draw('x')
-rescue NoMethodError
-  puts "Sign not connected"
-  message_board = nil
-end
+puts p.pretty_print_buffer
 
-loop do
-  coords = [
-    [0,0],
-    [0, p.buffer_height-p.font["height"]],
-    [p.buffer_width-p.viewport_width, p.buffer_height-p.font["height"]],
-    [p.buffer_width-p.viewport_width, 0],
-    [0,0]
-  ]
+# require 'dream-cheeky/led'
+# message_board = DreamCheeky::LEDMessageBoard.first
 
-  if message_board
-    p.path_viewport(coords).each do |vp|
-      message_board.draw(vp)
-      sleep(0.05)
-    end
-  else
-    p.pretty_pan_viewport(coords).each do |vp|
-      puts vp
-      sleep(0.05)
-    end
-  end
-end
+# #test if sign connected
+# begin
+#   message_board.draw('x')
+# rescue NoMethodError
+#   puts "Sign not connected"
+#   message_board = nil
+# end
+
+# loop do
+#   coords = [
+#     [0,0],
+#     [0, p.buffer_height-p.font["height"]],
+#     [p.buffer_width-p.viewport_width, p.buffer_height-p.font["height"]],
+#     [p.buffer_width-p.viewport_width, 0],
+#     [0,0]
+#   ]
+
+#   if message_board
+#     p.path_viewport(coords).each do |vp|
+#       message_board.draw(vp)
+#       sleep(0.05)
+#     end
+#   else
+#     p.pretty_pan_viewport(coords).each do |vp|
+#       puts vp
+#       sleep(0.05)
+#     end
+#   end
+# end
