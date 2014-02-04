@@ -26,7 +26,7 @@ class PeterPan
 
   def show_buffer
     normalize_buffer_size
-    
+
     str = "+#{'-' * @buffer.first.size}+\n"
     @buffer.each do |bx|
       str << '|'
@@ -37,17 +37,22 @@ class PeterPan
     str
   end
 
+  def buffer_width
+    if !@buffer_width || @buffer_changed
+      @buffer_width = 0
+      @buffer.each do |by|
+        @buffer_width = by.size if by.size > @buffer_width
+      end
+    end
+    @buffer_width
+  end
+
   def normalize_buffer_size
     return unless @buffer_changed
-    longest_x = 0
-    @buffer.each do |by|
-      longest_x = by.size if by.size > longest_x
-    end
-    puts "longest_x: #{longest_x}"
 
     @buffer.each do |by|
-      if by.size < longest_x
-        (by.size-1).upto(longest_x-1) do |i|
+      if by.size < buffer_width
+        (by.size-1).upto(buffer_width-1) do |i|
           by[i] = ' '
         end
       end 
@@ -92,12 +97,8 @@ class PeterPan
     end
   end
 
-  def buffer_width
-    @buffer.first.size+1
-  end
-
   def buffer_height
-    @buffer.size+1
+    @buffer.size
   end
 
   def calculate_integral_points(x1, y1, x2, y2)
@@ -155,7 +156,7 @@ lines = [
 
 lines.each_with_index do |line, i|
   puts "#{(i*font["height"])} #{line}"
-  puts i
+  puts p.buffer_width
   p.write(font, 0, (i*font["height"]), line)
 end
 
@@ -181,20 +182,21 @@ def pan_to(p, message_board, x1, y1, x2, y2)
   end
 end
 
-loop do
-  start_x=0
-  start_y=0
+# loop do
+#   start_x=0
+#   start_y=0
 
-  lines.each_with_index do |line, i|
-    [
-      [(line.size*font["width"])-p.viewport_width,(i*(font["height"]))],
-      [0,(i+1*(font["height"]))+(i==lines.size-1 ? 0:1)]
-    ].each do |x,y|
-      pan_to(p, message_board, start_x, start_y, x, y)
-      start_x = x
-      start_y = y
-    end
-  end
-  pan_to(p, message_board, start_x, start_y, 0, 0)
-end
+#   lines.each_with_index do |line, i|
+#     [
+#       [(line.size*font["width"])-p.viewport_width,(i*(font["height"]))],
+#       [0,(i+1*(font["height"]))+(i==lines.size-1 ? 0:1)]
+#     ].each do |x,y|
+#       pan_to(p, message_board, start_x, start_y, x, y)
+#       start_x = x
+#       start_y = y
+#     end
+#   end
+#   pan_to(p, message_board, start_x, start_y, 0, 0)
+# end
 
+# pan_to(p, message_board, 0, 0, p.buffer_width-p.viewport_width,p.buffer_height-font["height"])
