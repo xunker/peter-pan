@@ -7,11 +7,14 @@ class PeterPan
   def initialize(opts={})
     @viewport_width = (opts[:viewport_width] || 21).to_i # x
     @viewport_height = (opts[:viewport_height] || 7).to_i # y
+    @font_name = (opts[:font] || 'transpo')
     @buffer_changed = false
     @buffer = []
   end
 
-  def plot(x,y, value='*')
+  # Draw a point in the virtual buffer.
+  # The virtual buffer will be enlarged automatically.
+  def plot(x, y, value='*')
     1.upto(y+1) do |i|
       @buffer[i-1] ||= []
       1.upto(x+1) do |ii|
@@ -24,19 +27,19 @@ class PeterPan
     @buffer_changed = true
   end
 
+  # Same as #show_buffer but  with an ascii-art frame around it.
   def pretty_print_buffer
-    normalize_buffer_size
-
-    str = "+#{'-' * @buffer.first.size}+\n"
-    @buffer.each do |bx|
-      str << '|'
-      str << bx.join
-      str << "|\n"
-    end
-    str << "+#{'-' * @buffer.first.size}+\n"
-    str
+    frame_content(show_buffer)
   end
 
+  # Return the current buffer as a string delimited by "\n" characters
+  def show_buffer
+    normalize_buffer_width
+
+    @buffer.map{|bx| "#{bx.join}\n" }.join
+  end
+
+  # Return an integer of the width of the buffer at it's widest point.
   def buffer_width
     if !@buffer_width || @buffer_changed
       @buffer_width = 0
@@ -47,7 +50,71 @@ class PeterPan
     @buffer_width
   end
 
-  def normalize_buffer_size
+  # Return an integer of the height of the buffer at it tallest point
+  def buffer_height
+    @buffer.size
+  end
+
+  # Show a viewport area of the larger buffer.
+  # width and height of the viewport can be set in the object
+  # initialization for defaults, or manually here.
+  # Returns a string delimited by "\n" characters.
+  def show_viewport(x,y,x2=@viewport_width,y2=@viewport_height)
+    normalize_buffer_width
+
+    y.upto((y2-1)+y).map do |i|
+      buffer_row = @buffer[i] || @viewport_width.times.map{' '}
+      sprintf("%-#{x2}s", buffer_row[x..((x2-1)+x)].join) + "\n"
+    end.join
+  end
+
+  # Same as #show_viewort, but with an ascii-art frame around it.
+  def pretty_print_viewport(x,y,x2=@viewport_width,y2=@viewport_height)
+    frame_content(show_viewport(x,y,x2,y2))
+  end
+
+  # Move the viewport over the buffer from x1/y1 to x2/y2.
+  # Returns an array of strings. Each string is a frame of the pan path
+  # of the kind returned by #show_viewport.
+  def pan_viewport(x1, y1, x2, y2)
+    calculate_integral_points(x1, y1, x2, y2).map do |px, py|
+      show_viewport(px, py)
+    end
+  end
+
+  # Same as #pan_viewport, but with an ascii-art frame around it.
+  def pretty_pan_viewport(x1, y1, x2, y2)
+    pan_viewport(x1, y1, x2, y2).map{|vp| frame_content(vp) }
+  end
+
+  # Draw a text sprint to the buffer at given coordinates.
+  # * sprite is an ARRAY of string representing the image.
+  def plot_sprite(sprite, x, y)
+    sprite.each_with_index do |line, line_y|
+      line.split('').each_with_index do |c, char_x|
+        plot(char_x + x, line_y + y, c)
+      end
+    end
+  end
+
+  # Write a string to the buffer at the given coordinates.
+  def write(x, y, message)
+    letter_x = x
+    message.split('').each do |c|
+      char = font['characters'][c].map{|l|l.gsub('.', ' ')}
+      plot_sprite(char, letter_x, y)
+      letter_x = letter_x + font['width'] + 1
+    end
+  end
+
+  # returns a data structure representing the current font used by #write.
+  def font
+    @font ||= YAML.load(File.new("./fonts/#{@font_name}.yml").read)
+  end
+
+private
+
+  def normalize_buffer_width
     return unless @buffer_changed
 
     @buffer.each do |by|
@@ -61,60 +128,17 @@ class PeterPan
     @buffer_changed = false
   end
 
-  def show_viewport(x,y,x2=@viewport_width,y2=@viewport_height)
-    normalize_buffer_size
 
-    str = ""
-    y.upto((y2-1)+y) do |i|
-      buffer_row = @buffer[i] || @viewport_width.times.map{' '}
-      str << sprintf("%-#{x2}s", buffer_row[x..((x2-1)+x)].join)
-      str << "\n"
-    end
-    
-    str
-  end
-
-  def pretty_print_viewport(x,y,x2=@viewport_width,y2=@viewport_height)
-    str = "+#{'-' * (x2)}+\n"
-    vp = show_viewport(x,y,x2,y2)
+  def frame_content(content)
+    content_width = content.index("\n")
+    str = "+#{'-' * content_width}+\n"
+    vp = content
     str << vp.gsub(/^/, '|').gsub(/$/, '|').gsub(/^\|$/, '')
-    str << "+#{'-' * (x2)}+\n"
+    str << "+#{'-' * content_width}+\n"
     str
   end
 
-  def pan_viewport(x1, y1, x2, y2)
-    calculate_integral_points(x1, y1, x2, y2).map do |px, py|
-      show_viewport(px, py)
-    end
-  end
-
-  def pretty_pan_viewport(x1, y1, x2, y2)
-    calculate_integral_points(x1, y1, x2, y2).map do |px, py|
-      pretty_print_viewport(px, py)
-    end
-  end
-
-  def plot_sprite(sprite, x, y)
-    sprite.each_with_index do |line, line_y|
-      line.split('').each_with_index do |c, char_x|
-        plot(char_x + x, line_y + y, c)
-      end
-    end
-  end
-
-  def write(font, x, y, message)
-    letter_x = x
-    message.split('').each do |c|
-      char = font['characters'][c].map{|l|l.gsub('.', ' ')}
-      plot_sprite(char, letter_x, y)
-      letter_x = letter_x + font['width'] + 1
-    end
-  end
-
-  def buffer_height
-    @buffer.size
-  end
-
+  # Why yes, actually, I did fail Jr. High math. Why do you ask?
   def calculate_integral_points(x1, y1, x2, y2)
     x_integrals = calculate_integrals(x1, x2)
     y_integrals = calculate_integrals(y1, y2)
@@ -153,7 +177,6 @@ end
 
 p = PeterPan.new
 
-font = YAML.load(File.new('./fonts/transpo.yml').read)
 # p.write(font, 0, 0, 'Hello,')
 # p.write(font, 0, font["height"]+1, 'world!')
 # lines = [
@@ -169,7 +192,7 @@ lines = [
 ]
 
 lines.each_with_index do |line, i|
-  p.write(font, 0, (i*font["height"])+(1*i), line)
+  p.write(0, (i*p.font["height"])+(1*i), line)
 end
 
 puts p.pretty_print_buffer
@@ -185,28 +208,10 @@ rescue NoMethodError
   message_board = nil
 end
 
-# loop do
-#   start_x=0
-#   start_y=0
-
-#   lines.each_with_index do |line, i|
-#     [
-#       [(line.size*font["width"])-p.viewport_width,(i*(font["height"]))],
-#       [0,(i+1*(font["height"]))+(i==lines.size-1 ? 0:1)]
-#     ].each do |x,y|
-#       pan_to(p, message_board, start_x, start_y, x, y)
-#       start_x = x
-#       start_y = y
-#     end
-#   end
-#   pan_to(p, message_board, start_x, start_y, 0, 0)
-# end
-
-
 loop do
   [
-    [0, 0, 0, p.buffer_height-font["height"]],
-    [0, p.buffer_height-font["height"], 0, 0]
+    [0, 0, 0, p.buffer_height-p.font["height"]],
+    [0, p.buffer_height-p.font["height"], 0, 0]
   ].each do |x1, y1, x2, y2|
     # p.pan_viewport(x1, y1, x2, y2).each do |vp|
     p.pretty_pan_viewport(x1, y1, x2, y2).each do |vp|
