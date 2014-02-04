@@ -4,13 +4,26 @@ require 'yaml'
 class PeterPan
   attr_reader :viewport_width, :viewport_height, :empty_point_character
 
+
+  # Options:
+  # :viewport_width - Viewport width, integer, default 21
+  # :viewport_height - Viewport height, integer, default 7
+  # :empty_point_character - the char of an empty cell (default ' ')
+  # :buffer_width - Buffer width, integer, default 0
+  # :buffer_height - Buffer height, integer, default 0
+  #
+  # NOTE: The buffer will automatically expand dimensionally to hold
+  #       any point that is #plot()'ed or text written with #write().
   def initialize(opts={})
     @viewport_width = (opts[:viewport_width] || 21).to_i # x
     @viewport_height = (opts[:viewport_height] || 7).to_i # y
-    @font_name = (opts[:font] || 'transpo')
+    @font_name = 'transpo' # only font for now
     @empty_point_character = (opts[:empty_point_character] || ' ')
     @buffer_changed = false
-    clear_buffer!
+    clear_buffer!(
+      :width => (opts[:buffer_width] || 0),
+      :height => (opts[:buffer_height] || 0)
+    )
   end
 
   # Draw a point in the virtual buffer.
