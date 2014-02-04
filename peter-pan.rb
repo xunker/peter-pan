@@ -11,7 +11,7 @@ class PeterPan
     @buffer = []
   end
 
-  def plot(x,y, value='X')
+  def plot(x,y, value='*')
     1.upto(y+1) do |i|
       @buffer[i-1] ||= []
       1.upto(x+1) do |ii|
