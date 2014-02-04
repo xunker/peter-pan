@@ -24,7 +24,7 @@ class PeterPan
     @buffer_changed = true
   end
 
-  def show_buffer
+  def pretty_print_buffer
     normalize_buffer_size
 
     str = "+#{'-' * @buffer.first.size}+\n"
@@ -57,6 +57,8 @@ class PeterPan
         end
       end 
     end
+
+    @buffer_changed = false
   end
 
   def show_viewport(x,y,x2=@viewport_width,y2=@viewport_height)
@@ -78,6 +80,18 @@ class PeterPan
     str << vp.gsub(/^/, '|').gsub(/$/, '|').gsub(/^\|$/, '')
     str << "+#{'-' * (x2)}+\n"
     str
+  end
+
+  def pan_viewport(x1, y1, x2, y2)
+    calculate_integral_points(x1, y1, x2, y2).map do |px, py|
+      show_viewport(px, py)
+    end
+  end
+
+  def pretty_pan_viewport(x1, y1, x2, y2)
+    calculate_integral_points(x1, y1, x2, y2).map do |px, py|
+      pretty_print_viewport(px, py)
+    end
   end
 
   def plot_sprite(sprite, x, y)
@@ -158,7 +172,7 @@ lines.each_with_index do |line, i|
   p.write(font, 0, (i*font["height"])+(1*i), line)
 end
 
-puts p.show_buffer
+puts p.pretty_print_buffer
 
 require 'dream-cheeky/led'
 message_board = DreamCheeky::LEDMessageBoard.first
@@ -169,15 +183,6 @@ begin
 rescue NoMethodError
   puts "Sign not connected"
   message_board = nil
-end
-
-def pan_to(p, message_board, x1, y1, x2, y2)
-  p.calculate_integral_points(x1, y1, x2, y2).each do |px, py|
-    puts "x1: #{x1} y1: #{y1}, x2: #{x2} y2:#{y2}"
-    puts p.pretty_print_viewport(px, py)
-    message_board.draw(p.show_viewport(px, py)) if message_board
-    sleep(0.05)
-  end
 end
 
 # loop do
@@ -197,7 +202,16 @@ end
 #   pan_to(p, message_board, start_x, start_y, 0, 0)
 # end
 
+
 loop do
-  pan_to(p, message_board, 0, 0, 0, p.buffer_height-font["height"])
-  pan_to(p, message_board, 0, p.buffer_height-font["height"], 0, 0)
+  [
+    [0, 0, 0, p.buffer_height-font["height"]],
+    [0, p.buffer_height-font["height"], 0, 0]
+  ].each do |x1, y1, x2, y2|
+    # p.pan_viewport(x1, y1, x2, y2).each do |vp|
+    p.pretty_pan_viewport(x1, y1, x2, y2).each do |vp|
+      puts vp
+      sleep(0.1)
+    end
+  end
 end
