@@ -27,9 +27,9 @@ class PeterPan
     @buffer_changed = true
   end
 
-  # Same as #show_buffer but  with an ascii-art frame around it.
+  # Same as #show_buffer but  with an ascii-art border around it.
   def pretty_print_buffer
-    frame_content(show_buffer)
+    wrap_frame_with_border(show_buffer)
   end
 
   # Return the current buffer as a string delimited by "\n" characters
@@ -68,9 +68,9 @@ class PeterPan
     end.join
   end
 
-  # Same as #show_viewort, but with an ascii-art frame around it.
+  # Same as #show_viewort, but with an ascii-art border around it.
   def pretty_print_viewport(x,y,x2=@viewport_width,y2=@viewport_height)
-    frame_content(show_viewport(x,y,x2,y2))
+    wrap_frame_with_border(show_viewport(x,y,x2,y2))
   end
 
   # Move the viewport over the buffer from x1/y1 to x2/y2.
@@ -82,9 +82,31 @@ class PeterPan
     end
   end
 
-  # Same as #pan_viewport, but with an ascii-art frame around it.
+  # Same as #pan_viewport, but with an ascii-art border around each frame.
   def pretty_pan_viewport(x1, y1, x2, y2)
-    pan_viewport(x1, y1, x2, y2).map{|vp| frame_content(vp) }
+    pan_viewport(x1, y1, x2, y2).map{|vp| wrap_frame_with_border(vp) }
+  end
+
+  # Like pan_viewport, but multiple pairs of coordinates can be passed.
+  # The first pair will be used as the start and the viewport will be
+  # panned from coordinate-pair to coordinate-pair.
+  # It expects to be passed an array-like list of coordinate pairs.
+  # It returns an array of string representing the frames of the pathing.
+  def path_viewport(*coordinates)
+    coordinates.flatten!
+    start_x = coordinates.shift
+    start_y = coordinates.shift
+    coordinates.flatten.each_slice(2).map do |x,y|
+      pan = pan_viewport(start_x, start_y, x, y)
+      start_x = x
+      start_y = y
+      pan
+    end.flatten
+  end
+
+  # Same as #path_viewport, but with an ascii-art border around each frame.
+  def pretty_pan_viewport(*coordinates)
+    path_viewport(coordinates).map{|vp| wrap_frame_with_border(vp) }
   end
 
   # Draw a text sprint to the buffer at given coordinates.
@@ -129,7 +151,7 @@ private
   end
 
 
-  def frame_content(content)
+  def wrap_frame_with_border(content)
     content_width = content.index("\n")
     str = "+#{'-' * content_width}+\n"
     vp = content
@@ -177,12 +199,6 @@ end
 
 p = PeterPan.new
 
-# p.write(font, 0, 0, 'Hello,')
-# p.write(font, 0, font["height"]+1, 'world!')
-# lines = [
-#   "Hello,", "world!"
-# ]
-
 lines = [
   "One",
   "Two",
@@ -209,14 +225,23 @@ rescue NoMethodError
 end
 
 loop do
-  [
-    [0, 0, 0, p.buffer_height-p.font["height"]],
-    [0, p.buffer_height-p.font["height"], 0, 0]
-  ].each do |x1, y1, x2, y2|
-    # p.pan_viewport(x1, y1, x2, y2).each do |vp|
-    p.pretty_pan_viewport(x1, y1, x2, y2).each do |vp|
+  coords = [
+    [0,0],
+    [0, p.buffer_height-p.font["height"]],
+    [p.buffer_width-p.viewport_width, p.buffer_height-p.font["height"]],
+    [p.buffer_width-p.viewport_width, 0],
+    [0,0]
+  ]
+
+  if message_board
+    p.path_viewport(coords).each do |vp|
+      message_board.draw(vp)
+      sleep(0.05)
+    end
+  else
+    p.pretty_pan_viewport(coords).each do |vp|
       puts vp
-      sleep(0.1)
+      sleep(0.05)
     end
   end
 end
