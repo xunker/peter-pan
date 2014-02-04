@@ -2,14 +2,15 @@
 require 'yaml'
 
 class PeterPan
-  attr_reader :viewport_width, :viewport_height
+  attr_reader :viewport_width, :viewport_height, :empty_point_character
 
   def initialize(opts={})
     @viewport_width = (opts[:viewport_width] || 21).to_i # x
     @viewport_height = (opts[:viewport_height] || 7).to_i # y
     @font_name = (opts[:font] || 'transpo')
+    @empty_point_character = (opts[:empty_point_character] || ' ')
     @buffer_changed = false
-    @buffer = []
+    clear_buffer!
   end
 
   # Draw a point in the virtual buffer.
@@ -18,7 +19,7 @@ class PeterPan
     1.upto(y+1) do |i|
       @buffer[i-1] ||= []
       1.upto(x+1) do |ii|
-        @buffer[i-1][ii-1] ||= ' '
+        @buffer[i-1][ii-1] ||= @empty_point_character
       end
     end
 
@@ -63,7 +64,7 @@ class PeterPan
     normalize_buffer_width
 
     y.upto((y2-1)+y).map do |i|
-      buffer_row = @buffer[i] || @viewport_width.times.map{' '}
+      buffer_row = @buffer[i] || @viewport_width.times.map{@empty_point_character}
       sprintf("%-#{x2}s", buffer_row[x..((x2-1)+x)].join) + "\n"
     end.join
   end
@@ -123,7 +124,7 @@ class PeterPan
   def write(x, y, message)
     letter_x = x
     message.split('').each do |c|
-      char = font['characters'][c].map{|l|l.gsub('.', ' ')}
+      char = font['characters'][c].map{|l|l.gsub('.', @empty_point_character)}
       plot_sprite(char, letter_x, y)
       letter_x = letter_x + font['width'] + 1
     end
@@ -135,7 +136,7 @@ class PeterPan
   # By default the buffer will be filled with space character, but you can 
   # set the char to be used by passing :clear_with
   def clear_buffer!(opts={})
-    opts = { :width => 0, :height => 0, :clear_with => ' ' }.merge(opts)
+    opts = { :width => 0, :height => 0, :clear_with => @empty_point_character }.merge(opts)
     @buffer = [[]]
     opts[:height].times do |y|
       @buffer[y] = []
@@ -158,7 +159,7 @@ private
     @buffer.each do |by|
       if by.size < buffer_width
         (by.size-1).upto(buffer_width-1) do |i|
-          by[i] = ' '
+          by[i] = @empty_point_character
         end
       end 
     end
@@ -226,10 +227,6 @@ lines = [
 lines.each_with_index do |line, i|
   p.write(0, (i*p.font["height"])+(1*i), line)
 end
-
-puts p.pretty_print_buffer
-
-p.clear_buffer!(width: 10, height: 3, clear_with: 'x')
 
 puts p.pretty_print_buffer
 
