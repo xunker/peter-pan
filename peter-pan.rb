@@ -176,7 +176,7 @@ def pan_to(p, message_board, x1, y1, x2, y2)
     puts "x1: #{x1} y1: #{y1}, x2: #{x2} y2:#{y2}"
     puts p.pretty_print_viewport(px, py)
     message_board.draw(p.show_viewport(px, py)) if message_board
-    sleep(0.1)
+    sleep(0.05)
   end
 end
 
@@ -197,5 +197,7 @@ end
 #   pan_to(p, message_board, start_x, start_y, 0, 0)
 # end
 
-pan_to(p, message_board, 0, 0, p.buffer_width-p.viewport_width,p.buffer_height-font["height"])
-pan_to(p, message_board, p.buffer_width-p.viewport_width,p.buffer_height-font["height"], 0, 0)
+loop do
+  pan_to(p, message_board, 0, 0, 0, p.buffer_height-font["height"])
+  pan_to(p, message_board, 0, p.buffer_height-font["height"], 0, 0)
+end
