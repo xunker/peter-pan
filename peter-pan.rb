@@ -155,9 +155,7 @@ lines = [
 ]
 
 lines.each_with_index do |line, i|
-  puts "#{(i*font["height"])} #{line}"
-  puts p.buffer_width
-  p.write(font, 0, (i*font["height"]), line)
+  p.write(font, 0, (i*font["height"])+(1*i), line)
 end
 
 puts p.show_buffer
@@ -199,4 +197,5 @@ end
 #   pan_to(p, message_board, start_x, start_y, 0, 0)
 # end
 
-# pan_to(p, message_board, 0, 0, p.buffer_width-p.viewport_width,p.buffer_height-font["height"])
+pan_to(p, message_board, 0, 0, p.buffer_width-p.viewport_width,p.buffer_height-font["height"])
+pan_to(p, message_board, p.buffer_width-p.viewport_width,p.buffer_height-font["height"], 0, 0)
