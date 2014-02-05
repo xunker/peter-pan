@@ -127,17 +127,16 @@ The viewport dimensions default to 21x7, the size of the Dream Cheeky LED,
 but can be changed by passing arguments to the initializer.
 
 ```ruby
-p = PeterPan.new( viewport_width: 5, viewport_height: 5 )
-p.write(0, 0, "Hello.")
-puts p.pretty_print_viewport(5,0)
-# => nil
-# +-----+
-# |     |
-# |     |
-# |  ***|
-# | *   |
-# | ****|
-# +-----+
+> p = PeterPan.new( viewport_width: 5, viewport_height: 5 )
+> p.write(0, 0, "Hello.")
+> puts p.pretty_print_viewport(5,0)
++-----+
+|     |
+|     |
+|  ***|
+| *   |
+| ****|
++-----+
 ```
 
 ### Printing without ascii borders
@@ -146,10 +145,9 @@ To print the buffer and viewport without the ascii-art borders, replace
 `pretty_print_viewport`  with 'show_viewport` using the same arguments:
 
 ```ruby
-p = PeterPan.new( viewport_width: 5, viewport_height: 5 )
-p.write(0, 0, "Hello.")
-puts p.show_viewport(5,0)
-# => nil
+> p = PeterPan.new( viewport_width: 5, viewport_height: 5 )
+> p.write(0, 0, "Hello.")
+> puts p.show_viewport(5,0)
      
      
   ***
