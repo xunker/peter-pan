@@ -1,4 +1,4 @@
-# Peter Pan - a Ruby gem providing a virtual screen buffer with viewport panning. For the Dream Cheeky LED sign and others.
+## Peter Pan - a Ruby gem providing a virtual screen buffer with viewport panning. For the Dream Cheeky LED sign and others.
 
 Peter Pan gives you a large, virtual text frame buffer and a virtual
 viewport you can move around over it. You can plot points or draw text in the
