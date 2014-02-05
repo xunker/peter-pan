@@ -19,7 +19,7 @@ class PeterPan
     @viewport_height = (opts[:viewport_height] || 7).to_i # y
     @font_name = 'transpo' # only font for now
     @empty_point_character = (opts[:empty_point_character] || ' ')
-    @buffer_changed = false
+    buffer_changed!(false)
     clear_buffer!(
       :width => (opts[:buffer_width] || 0),
       :height => (opts[:buffer_height] || 0)
@@ -38,7 +38,7 @@ class PeterPan
 
     @buffer[y][x] = value.to_s.slice(0,1)
 
-    @buffer_changed = true
+    buffer_changed!
   end
 
   # Same as #show_buffer but  with an ascii-art border around it.
@@ -55,7 +55,7 @@ class PeterPan
 
   # Return an integer of the width of the buffer at it's widest point.
   def buffer_width
-    if !@buffer_width || @buffer_changed
+    if !@buffer_width || buffer_changed?
       @buffer_width = 0
       @buffer.each do |by|
         @buffer_width = by.size if by.size > @buffer_width
@@ -157,6 +157,7 @@ class PeterPan
         @buffer[y][x] = opts[:clear_with].to_s.slice(0,1)
       end
     end
+    buffer_changed!
   end
 
   # returns a data structure representing the current font used by #write.
@@ -166,8 +167,16 @@ class PeterPan
 
 private
 
+  def buffer_changed!(val = true)
+    @buffer_changed = val
+  end
+
+  def buffer_changed?
+    !!@buffer_changed
+  end
+
   def normalize_buffer_width
-    return unless @buffer_changed
+    return unless buffer_changed?
 
     @buffer.each do |by|
       if by.size < buffer_width
@@ -177,7 +186,7 @@ private
       end 
     end
 
-    @buffer_changed = false
+    buffer_changed!
   end
 
 
@@ -229,30 +238,30 @@ end
 
 p = PeterPan.new
 
-lines = [
-  "One",
-  "Two",
-  "Three",
-  "Four",
-  "Five"
-]
+# lines = [
+#   "One",
+#   "Two",
+#   "Three",
+#   "Four",
+#   "Five"
+# ]
 
-lines.each_with_index do |line, i|
-  p.write(0, (i*p.font["height"])+(1*i), line)
-end
-
-puts p.pretty_print_buffer
-
-# require 'dream-cheeky/led'
-# message_board = DreamCheeky::LEDMessageBoard.first
-
-# #test if sign connected
-# begin
-#   message_board.draw('x')
-# rescue NoMethodError
-#   puts "Sign not connected"
-#   message_board = nil
+# lines.each_with_index do |line, i|
+#   p.write(0, (i*p.font["height"])+(1*i), line)
 # end
+
+# puts p.pretty_print_buffer
+
+require 'dream-cheeky/led'
+message_board = DreamCheeky::LEDMessageBoard.first
+
+#test if sign connected
+begin
+  message_board.draw('x')
+rescue NoMethodError
+  puts "Sign not connected"
+  message_board = nil
+end
 
 # loop do
 #   coords = [
@@ -275,3 +284,50 @@ puts p.pretty_print_buffer
 #     end
 #   end
 # end
+
+require 'httparty'
+
+rpm = 0
+loop do
+
+  response = HTTParty.get(
+    'http://bookshelf.deseretbook.com/admin/api/rpm',
+    basic_auth: { username: "mnielsen", password: "KKll0099"}
+  )
+  
+  last_rpm = rpm
+  rpm =  response.body.to_i
+  start = Time.now
+  p.clear_buffer!
+  diff = rpm - last_rpm
+  p.write(0, 0, " #{rpm} rpm")
+  if last_rpm == 0 || last_rpm == rpm
+    p.write(0, p.font["height"]+1, "no change")
+  else
+    p.write(0, p.font["height"]+1, " #{diff > 0 ? 'up' : 'down'} #{diff.abs} ")
+  end
+  puts p.pretty_print_buffer
+  coords = [
+    [ 0, 0 ],
+    [ p.buffer_width-p.viewport_width, 0 ],
+    [ 0, p.buffer_height-p.viewport_height ],
+    [ p.buffer_width-p.viewport_width, p.buffer_height-p.viewport_height ],
+    [ 0, 0 ]
+  ]
+
+  while start > (Time.now - 60)
+    if message_board
+      p.path_viewport(coords).each do |vp|
+        message_board.draw(vp)
+        sleep(0.2)
+      end
+    else
+      p.pretty_pan_viewport(coords).each do |vp|
+        puts vp
+        sleep(0.2)
+      end
+    end
+
+  end
+  
+end
