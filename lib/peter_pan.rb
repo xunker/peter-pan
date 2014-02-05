@@ -1,9 +1,8 @@
-#!/usr/bin/env ruby
 require 'yaml'
-
 class PeterPan
   attr_reader :viewport_width, :viewport_height, :empty_point_character
 
+  VERSION = "0.0.1"
 
   # Options:
   # :viewport_width - Viewport width, integer, default 21
@@ -234,100 +233,4 @@ private
     end
     integrals
   end
-end
-
-p = PeterPan.new
-
-# lines = [
-#   "One",
-#   "Two",
-#   "Three",
-#   "Four",
-#   "Five"
-# ]
-
-# lines.each_with_index do |line, i|
-#   p.write(0, (i*p.font["height"])+(1*i), line)
-# end
-
-# puts p.pretty_print_buffer
-
-require 'dream-cheeky/led'
-message_board = DreamCheeky::LEDMessageBoard.first
-
-#test if sign connected
-begin
-  message_board.draw('x')
-rescue NoMethodError
-  puts "Sign not connected"
-  message_board = nil
-end
-
-# loop do
-#   coords = [
-#     [0,0],
-#     [0, p.buffer_height-p.font["height"]],
-#     [p.buffer_width-p.viewport_width, p.buffer_height-p.font["height"]],
-#     [p.buffer_width-p.viewport_width, 0],
-#     [0,0]
-#   ]
-
-#   if message_board
-#     p.path_viewport(coords).each do |vp|
-#       message_board.draw(vp)
-#       sleep(0.05)
-#     end
-#   else
-#     p.pretty_pan_viewport(coords).each do |vp|
-#       puts vp
-#       sleep(0.05)
-#     end
-#   end
-# end
-
-require 'httparty'
-
-rpm = 0
-loop do
-
-  response = HTTParty.get(
-    'http://bookshelf.deseretbook.com/admin/api/rpm',
-    basic_auth: { username: "mnielsen", password: "KKll0099"}
-  )
-  
-  last_rpm = rpm
-  rpm =  response.body.to_i
-  start = Time.now
-  p.clear_buffer!
-  diff = rpm - last_rpm
-  p.write(0, 0, " #{rpm} rpm")
-  if last_rpm == 0 || last_rpm == rpm
-    p.write(0, p.font["height"]+1, "no change")
-  else
-    p.write(0, p.font["height"]+1, " #{diff > 0 ? 'up' : 'down'} #{diff.abs} ")
-  end
-  puts p.pretty_print_buffer
-  coords = [
-    [ 0, 0 ],
-    [ p.buffer_width-p.viewport_width, 0 ],
-    [ 0, p.buffer_height-p.viewport_height ],
-    [ p.buffer_width-p.viewport_width, p.buffer_height-p.viewport_height ],
-    [ 0, 0 ]
-  ]
-
-  while start > (Time.now - 60)
-    if message_board
-      p.path_viewport(coords).each do |vp|
-        message_board.draw(vp)
-        sleep(0.2)
-      end
-    else
-      p.pretty_pan_viewport(coords).each do |vp|
-        puts vp
-        sleep(0.2)
-      end
-    end
-
-  end
-  
 end
