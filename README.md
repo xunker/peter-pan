@@ -19,7 +19,7 @@ This gem uses the "transpo" font from Lewis Clayton's dcled_ruby project
 
 Install normally:
 
-  $ gem install peter_pan
+    $ gem install peter_pan
 
 And then require it normally:
 
@@ -30,14 +30,14 @@ And then require it normally:
 To write to a Dream Cheeky LED sign using `examples/dream_cheeky.rb`, also
 install the dream-cheeky-led gem:
 
-  $ gem install dream-cheeky-led --pre
+    $ gem install dream-cheeky-led --pre
 
 ## Examples
 
 There are basic examples in the `examples/` directory:
 
-  dream_cheeky.rb: write to a USB Dream Cheeky Sign
-  to_screen.rb:    write to the screen
+    dream_cheeky.rb: write to a USB Dream Cheeky Sign
+    to_screen.rb:    write to the screen
 
 These examples show the basic concepts of drawing text to the buffer and
 panning the viewport over the buffer.
@@ -120,6 +120,49 @@ Print text to the buffer and render the viewport over a portion.
 |  ***   ***   ***   *|
 +---------------------+
 ```
+
+### Change viewport size
+
+The viewport dimensions default to 21x7, the size of the Dream Cheeky LED,
+but can be changed by passing arguments to the initializer.
+
+```ruby
+p = PeterPan.new( viewport_width: 5, viewport_height: 5 )
+p.write(0, 0, "Hello.")
+puts p.pretty_print_viewport(5,0)
+# => nil
+# +-----+
+# |     |
+# |     |
+# |  ***|
+# | *   |
+# | ****|
+# +-----+
+```
+
+### Printing without ascii borders
+
+To print the buffer and viewport without the ascii-art borders, replace
+`pretty_print_viewport`  with 'show_viewport` using the same arguments:
+
+```ruby
+p = PeterPan.new( viewport_width: 5, viewport_height: 5 )
+p.write(0, 0, "Hello.")
+puts p.show_viewport(5,0)
+# => nil
+     
+     
+  ***
+ *   
+ ****
+```
+
+All other `pretty_*` methods have `show_*` counterparts that will return data
+without the enclosing border.
+
+### Animated panning the viewport
+
+Please see the examples in `examples/`.
 
 ## Documentation
 
