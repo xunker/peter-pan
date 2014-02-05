@@ -1,18 +1,28 @@
+# Peter Pan - a Ruby gem providing a virtual screen buffer with viewport
+# panning. For the Dream Cheeky LED sign and others.
+#
+# Home page at https://github.com/xunker/peter_pan
+#
+# Author::    Matthew Nielsen (mailto:xunker@pyxidis.org)
+# Copyright:: Copyright (c) 2014
+# License::   MIT
+
 require 'yaml'
 class PeterPan
   attr_reader :viewport_width, :viewport_height, :empty_point_character
 
-  VERSION = "0.0.1"
+  VERSION = "1.0.0"
 
-  # Options:
-  # :viewport_width - Viewport width, integer, default 21
-  # :viewport_height - Viewport height, integer, default 7
-  # :empty_point_character - the char of an empty cell (default ' ')
-  # :buffer_width - Buffer width, integer, default 0
-  # :buffer_height - Buffer height, integer, default 0
+  # Possible Options:
+  #
+  # * :viewport_width - Viewport width, integer, default 21
+  # * :viewport_height - Viewport height, integer, default 7
+  # * :empty_point_character - the char of an empty cell (default ' ')
+  # * :buffer_width - Buffer width, integer, default 0
+  # * :buffer_height - Buffer height, integer, default 0
   #
   # NOTE: The buffer will automatically expand dimensionally to hold
-  #       any point that is #plot()'ed or text written with #write().
+  # any point that is #plot()'ed or text written with #write().
   def initialize(opts={})
     @viewport_width = (opts[:viewport_width] || 21).to_i # x
     @viewport_height = (opts[:viewport_height] || 7).to_i # y

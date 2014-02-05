@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+#
+# Draws words to the virtual butter and then pans the viewport around it.
 require 'peter_pan'
 
 p = PeterPan.new
