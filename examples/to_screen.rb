@@ -6,16 +6,12 @@ p = PeterPan.new
 lines = [
   "One",
   "Two",
-  "Three",
-  "Four",
-  "Five"
+  "Three"
 ]
 
 lines.each_with_index do |line, i|
   p.write(0, (i*p.font["height"])+(1*i), line)
 end
-
-puts p.pretty_print_buffer
 
 loop do
   coords = [
@@ -27,8 +23,10 @@ loop do
   ]
 
   p.pretty_pan_viewport(coords).each do |vp|
-    puts vp
-    sleep(0.05)
+    print "\e[2J\e[f" # clear screen
+    puts p.pretty_print_buffer # print whole buffer
+    puts vp # print current viewport frame
+    sleep(0.1)
   end
 
 end
