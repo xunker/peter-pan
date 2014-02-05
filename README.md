@@ -164,4 +164,4 @@ Please see the examples in `examples/`.
 
 ## Documentation
 
-TODO: add link to RDOC here.
+Detailed docs available [at rubydoc.org](http://rubydoc.org/github/xunker/peter_pan/master/frames)
