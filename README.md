@@ -8,9 +8,10 @@ graphics.
 It was written to make it easier to get text on the Dream Cheeky LED sign, but
 it'll work for any thing that that accepts a formatted text string as input.
 
-The dream-cheeky-led gem (https://github.com/Aupajo/dream-cheeky-led) is not a
-dependency, but it can be used in conjunction with this gem to get scrolling
-text and graphics on your Dream Cheeky LED sign.
+The dream-cheeky-led gem (https://github.com/Aupajo/dream-cheeky-led) is not
+a runtime dependency, but it can be used in conjunction with this gem to get
+scrolling text and graphics on your Dream Cheeky LED sign. It is a
+development dependency in order to make `examples/dream_cheeky.rb` work.
 
 This gem uses the "transpo" font from Lewis Clayton's dcled_ruby project
 (https://github.com/Lewis-Clayton/dcled_ruby).
