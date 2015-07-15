@@ -11,7 +11,7 @@ require 'yaml'
 class PeterPan
   attr_reader :viewport_width, :viewport_height, :empty_point_character
 
-  VERSION = "1.0.0"
+  VERSION = "1.0.1"
 
   # Possible Options:
   #
@@ -155,7 +155,7 @@ class PeterPan
   # clears everything out of the buffer.
   # By default, sets the buffer dimensions to 0x0. Optionally, you can pass
   # :width and :height args and the buffer dimentions will be set accordingly.
-  # By default the buffer will be filled with space character, but you can 
+  # By default the buffer will be filled with space character, but you can
   # set the char to be used by passing :clear_with
   def clear_buffer!(opts={})
     opts = { :width => 0, :height => 0, :clear_with => @empty_point_character }.merge(opts)
@@ -171,7 +171,7 @@ class PeterPan
 
   # returns a data structure representing the current font used by #write.
   def font
-    @font ||= YAML.load(File.new("./fonts/#{@font_name}.yml").read)
+    @font ||= YAML.load(File.new("#{Gem.loaded_specs['peter_pan'].full_gem_path}/fonts/#{@font_name}.yml").read)
   end
 
 private
@@ -192,7 +192,7 @@ private
         (by.size-1).upto(buffer_width-1) do |i|
           by[i] = @empty_point_character
         end
-      end 
+      end
     end
 
     buffer_changed!
