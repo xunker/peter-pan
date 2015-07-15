@@ -21,29 +21,28 @@ This gem uses the "transpo" font from Lewis Clayton's dcled_ruby project
 
 ## Installation
 
-Install normally:
+Install normally: `$ gem install peter_pan`
 
-    $ gem install peter_pan
+And then require it normally: `require 'peter_pan'`
 
-And then require it normally:
+To write to a Dream Cheeky LED sign using `examples/*.rb`, also
+install the most current version of the `dream-cheeky-led` gem:
 
-```ruby
-  require 'peter_pan'
+```shell
+$ gem install dream-cheeky-led --pre
 ```
 
-To write to a Dream Cheeky LED sign using `examples/dream_cheeky.rb`, also
-install the dream-cheeky-led gem:
-
-    $ gem install dream-cheeky-led --pre
+If you are using Bundler to install the dependencies, version "0.0.1.pre2" or
+greater will be installed automatically
 
 ## Examples
 
 There are basic examples in the `examples/` directory that illustrate basic
 concepts of drawing text to the buffer and panning the viewport over the it.
 
-    * bouncer_dream_cheeky.rb - A pixel that bounces around the Dream Cheeky LED sign.
-    * pan_dream_cheeky.rb - Pans the Dream Cheeky LED sign over a larger virtual buffer.
-    * pan_to_screen.rb - Same as _pan_dream_cheeky.rb_, but outputs to screen -- no Dream Cheeky LED sign required!
+* `bouncer_dream_cheeky.rb` - A pixel that bounces around the Dream Cheeky LED sign.
+* `pan_dream_cheeky.rb` - Pans the Dream Cheeky LED sign over a larger virtual buffer.
+* `pan_to_screen.rb` - Same as _pan_dream_cheeky.rb_, but outputs to screen -- no Dream Cheeky LED sign required!
 
 ## Usage
 
