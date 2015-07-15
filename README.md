@@ -1,4 +1,4 @@
-## Peter Pan - a Ruby gem providing a virtual screen buffer with viewport panning. For the Dream Cheeky LED sign and others, also works just fine with computer screen.
+### Peter Pan - a Ruby gem providing a virtual screen buffer with viewport panning. For the Dream Cheeky LED sign and others, also works just fine with computer screen.
 
 Peter Pan gives you a large, virtual text frame buffer and a virtual
 viewport you can move around over it. You can plot points or draw text in the
@@ -38,13 +38,12 @@ install the dream-cheeky-led gem:
 
 ## Examples
 
-There are basic examples in the `examples/` directory:
+There are basic examples in the `examples/` directory that illustrate basic
+concepts of drawing text to the buffer and panning the viewport over the it.
 
-    dream_cheeky.rb: write to a USB Dream Cheeky Sign
-    to_screen.rb:    write to the screen
-
-These examples show the basic concepts of drawing text to the buffer and
-panning the viewport over the buffer.
+    * bouncer_dream_cheeky.rb - A pixel that bounces around the Dream Cheeky LED sign.
+    * pan_dream_cheeky.rb - Pans the Dream Cheeky LED sign over a larger virtual buffer.
+    * pan_to_screen.rb - Same as _pan_dream_cheeky.rb_, but outputs to screen -- no Dream Cheeky LED sign required!
 
 ## Usage
 
@@ -164,8 +163,29 @@ without the enclosing border.
 
 ### Animated panning the viewport
 
-Please see the examples in `examples/`.
+Check out `examples/pan_dream_cheeky.rb` and `examples/pan_to_screen.rb` to see
+how to animate the movement of the viewport over the buffer.
+
+[This animated image](https://github.com/xunker/peter_pan/raw/master/panning_text_example.gif) shows how `examples/pan_dream_cheeky.rb` looks when running on an actual Dream Cheeky LED sign.
 
 ## Documentation
 
 Detailed docs available [at rubydoc.org](http://rubydoc.org/github/xunker/peter_pan/master/frames)
+
+
+## Source
+
+Source lives on Github: [xunker/peter_pan](https://github.com/xunker/peter_pan).
+
+## Contributing
+
+You'll notice there are no tests in this repo, and that's my fault. That means
+that if you'd like to make some changes or fix some bug, you don't need to
+write tests if you don't want to! Yay!
+
+Here's the process if you'd like to contribute:
+
+  * Fork the repo.
+  * Make your changes. If you can, please make your changes in a topic branch, not master.
+  * Test your changes as well as you can. I'll believe you if you say you did.
+  * Make a pull request.
