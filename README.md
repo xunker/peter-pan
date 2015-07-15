@@ -1,3 +1,4 @@
+[![Gem Version](https://badge.fury.io/rb/peter_pan.svg)](http://badge.fury.io/rb/peter_pan)
 ### Peter Pan - a Ruby gem providing a virtual screen buffer with viewport panning. For the Dream Cheeky LED sign and others, also works just fine with computer screen.
 
 Peter Pan gives you a large, virtual text frame buffer and a virtual
