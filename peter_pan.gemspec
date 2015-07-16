@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = PeterPan::VERSION
   spec.authors       = ["Matthew Nielsen"]
   spec.email         = ["xunker@pyxidis.org"]
-  spec.description   = %q{A virtual screen buffer with viewport panning. For the Dream Cheeky LED sign and others.}
-  spec.summary       = %q{A virtual screen buffer with viewport panning. For the Dream Cheeky LED sign and others.}
+  spec.description   = %q{A virtual screen buffer with viewport panning. For the Dream Cheeky LED sign, but also works with a plain old computer screen.}
+  spec.summary       = %q{A virtual screen buffer with viewport panning. For the Dream Cheeky LED sign, but also works with a plain old computer screen.}
   spec.homepage      = "https://github.com/xunker/peter_pan"
   spec.license       = "MIT"
 
@@ -20,4 +20,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake", "~> 0"
+  spec.add_development_dependency "rspec", "~> 3.0"
 end

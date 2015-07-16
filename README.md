@@ -173,13 +173,10 @@ Source lives on Github: [xunker/peter_pan](https://github.com/xunker/peter_pan).
 
 ## Contributing
 
-You'll notice there are no tests in this repo, and that's my fault. That means
-that if you'd like to make some changes or fix some bug, you don't need to
-write tests if you don't want to! Yay!
-
 Here's the process if you'd like to contribute:
 
   * Fork the repo.
   * Make your changes. If you can, please make your changes in a topic branch, not master.
-  * Test your changes as well as you can. I'll believe you if you say you did.
+  * Make sure the existing tests pass.
+  * Write tests for your feature/fix.
   * Make a pull request.

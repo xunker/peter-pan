@@ -128,7 +128,7 @@ class PeterPan
   end
 
   # Same as #path_viewport, but with an ascii-art border around each frame.
-  def pretty_pan_viewport(*coordinates)
+  def pretty_path_viewport(*coordinates)
     path_viewport(coordinates).map{|vp| wrap_frame_with_border(vp) }
   end
 
@@ -143,11 +143,10 @@ class PeterPan
   end
 
   # Write a string to the buffer at the given coordinates.
-  def write(x, y, message)
-    letter_x = x
+  def write(letter_x, letter_y, message)
     message.split('').each do |c|
-      char = font['characters'][c].map{|l|l.gsub('.', @empty_point_character)}
-      plot_sprite(char, letter_x, y)
+      char = font_character(c)
+      plot_sprite(char, letter_x, letter_y)
       letter_x = letter_x + font['width'] + 1
     end
   end
@@ -175,6 +174,12 @@ class PeterPan
   end
 
 private
+
+  # return the font character for a given character. If no character exists,
+  # return '?' instead.
+  def font_character(char)
+    (font['characters'][char] || font['characters']['?']).map{|l|l.gsub('.', @empty_point_character)}
+  end
 
   def buffer_changed!(val = true)
     @buffer_changed = val

@@ -4,3 +4,4 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'dream-cheeky-led', '>=0.0.1.pre2'
+gem 'guard-rspec'
