@@ -166,6 +166,17 @@ how to animate the movement of the viewport over the buffer.
 
 Detailed docs available [at rubydoc.org](http://rubydoc.org/github/xunker/peter_pan/master/frames)
 
+## Changes
+
+### 1.1.0 July 16, 2015
+`#write` will remove characters that are not in the included font.
+
+### 1.0.1 July 15, 2015
+Fixed issue with loading font file.
+
+### 1.0.0
+Initial Release
+
 
 ## Source
 

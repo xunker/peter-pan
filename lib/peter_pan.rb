@@ -11,7 +11,7 @@ require 'yaml'
 class PeterPan
   attr_reader :viewport_width, :viewport_height, :empty_point_character
 
-  VERSION = "1.0.1"
+  VERSION = "1.1.0"
 
   # Possible Options:
   #
