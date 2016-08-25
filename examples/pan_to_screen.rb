@@ -24,7 +24,7 @@ loop do
     [0,0]
   ]
 
-  p.pretty_pan_viewport(coords).each do |vp|
+  p.path_viewport(coords).each do |vp|
     print "\e[2J\e[f" # clear screen
     puts p.pretty_print_buffer # print whole buffer
     puts vp # print current viewport frame
