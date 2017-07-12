@@ -4,14 +4,14 @@
 # Home page at https://github.com/xunker/peter_pan
 #
 # Author::    Matthew Nielsen (mailto:xunker@pyxidis.org)
-# Copyright:: Copyright (c) 2014
+# Copyright:: Copyright (c) 2014-2017
 # License::   MIT
 
 require 'yaml'
 class PeterPan
   attr_reader :viewport_width, :viewport_height, :empty_point_character
 
-  VERSION = "1.1.0"
+  VERSION = "1.2.0"
 
   # Possible Options:
   #
@@ -171,6 +171,30 @@ class PeterPan
   # returns a data structure representing the current font used by #write.
   def font
     @font ||= YAML.load(File.new("#{Gem.loaded_specs['peter_pan'].full_gem_path}/fonts/#{@font_name}.yml").read)
+  end
+
+  # slide buffer contents one pixel up
+  def shift_up
+    @buffer << @buffer.shift
+  end
+
+  # slide buffer contents one pixel down
+  def shift_down
+    @buffer.unshift(@buffer.pop)
+  end
+
+  # slide buffer contents one pixel left
+  def shift_left
+    @buffer.each do |row|
+      row << row.shift
+    end
+  end
+
+  # slide buffer contents one pixel right
+  def shift_right
+    @buffer.each do |row|
+      row.unshift(row.pop)
+    end
   end
 
 private
